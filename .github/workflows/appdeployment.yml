@@ -3,12 +3,18 @@ on:
   push:
     tags: [ '*\.*\.*' ]
 
-jobs:
-  publish_to_dockerhub:
-    runs-on: ubuntu-latest
-    steps:
-    - name: Chechout code
-      uses: actions/checkout@v3
+jobs:   
+  build:    
+    runs-on: ubuntu-18.04    
+    env:      
+      DOCKER_REGISTRY: devkrolikowski
+      DOCKER_IMAGE: swiss-army-knife      
+      DOCKER_USERNAME: ${{ secrets.DOCKER_USERNAME }}
+      DOCKER_PASSWORD: ${{ secrets.DOCKER_PASSWORD }}  
+      DOCKER_TARGET_PLATFORM: linux/arm/v7                     
+    steps:    
+    - name: Checkout the code       
+      uses: actions/checkout@v1
     - name: Read tags
       id: read
       run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
@@ -17,17 +23,26 @@ jobs:
         RELEASE_VERSION: ${{ steps.read.outputs.tag }}
       run: |
         echo tag: ${{ steps.read.outputs.tag }}
-    - name: Login to DockerHub
-      uses: docker/login-action@v2
-      if: ${{ steps.read.outputs.tag }} != 'main'
-      with:
-        username: ${{ secrets.DOCKERHUB_LOGIN }}
-        password: ${{ secrets.DOCKERHUB_PASS }}
-    - name: Build and push
-      if: ${{ steps.read.outputs.tag }} != 'main'
-      run: |
+    - name: Set up Docker Buildx      
+      uses: crazy-max/ghaction-docker-buildx@v1      
+      with:        
+        version: latest        
+        - name: Prepare      
+      if: success()      
+      id: prepare      
+      run: |        
+        echo ::set-output name=docker_platform::${DOCKER_TARGET_PLATFORM}        
+        echo ::set-output name=docker_image::${DOCKER_REGISTRY}/${DOCKER_IMAGE}        
+        echo ::set-output name=version::${GITHUB_RUN_NUMBER}        
+      - name: Docker Login      
+      if: success()      
+      run: |        
+        echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
+      - name: Run Buildx (push image)      
+      if: success()      
+      run: |        
         docker buildx build \
-          --platform linux/arm/v7 \ 
-          --tag devkrolikowski/swiss-army-knife:${{ steps.read.outputs.tag }} \
-          --file ./Dockerfile \ 
-          --output type=image,push=true .
+        --platform ${{ steps.prepare.outputs.docker_platform }} \
+        --tag ${{ steps.prepare.outputs.docker_image }}:${{ steps.read.outputs.tag }} \
+        --file ./Dockerfile \
+        --output type=image,push=true .
