@@ -24,9 +24,10 @@ jobs:
         username: ${{ secrets.DOCKERHUB_LOGIN }}
         password: ${{ secrets.DOCKERHUB_PASS }}
     - name: Build and push
-      uses: docker/build-push-action@v3
       if: ${{ steps.read.outputs.tag }} != 'main'
-      with:
-        platforms: linux/arm/v7
-        push: true
-        tags: devkrolikowski/swiss-army-knife:${{ steps.read.outputs.tag }}
+      run: |
+        docker buildx build \
+          --platform linux/arm/v7 \ 
+          --tag devkrolikowski/swiss-army-knife:${{ steps.read.outputs.tag }} \
+          --file ./Dockerfile \ 
+          --output type=image,push=true .
