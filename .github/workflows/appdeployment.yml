@@ -27,18 +27,18 @@ jobs:
       uses: crazy-max/ghaction-docker-buildx@v1
       with:        
         version: latest        
-    - name: Prepare      
-      if: success()      
+    - name: Prepare
+      if: success()
       id: prepare      
       run: |        
         echo ::set-output name=docker_platform::${DOCKER_TARGET_PLATFORM}        
         echo ::set-output name=docker_image::${DOCKER_REGISTRY}/${DOCKER_IMAGE}        
         echo ::set-output name=version::${GITHUB_RUN_NUMBER}        
-      - name: Docker Login      
+    - name: Docker Login      
       if: success()      
       run: |        
         echo "${DOCKER_PASSWORD}" | docker login --username "${DOCKER_USERNAME}" --password-stdin
-      - name: Run Buildx (push image)      
+    - name: Run Buildx (push image)      
       if: success()      
       run: |        
         docker buildx build \
