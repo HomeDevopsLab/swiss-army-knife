@@ -9,6 +9,7 @@ jobs:
     steps:
     - name: Chechout code
       uses: actions/checkout@v3
+      uses: pguyot/arm-runner-action@v2
     - name: Read tags
       id: read
       run: echo "tag=${GITHUB_REF#refs/*/}" >> $GITHUB_OUTPUT
@@ -19,12 +20,14 @@ jobs:
         echo tag: ${{ steps.read.outputs.tag }}
     - name: Login to DockerHub
       uses: docker/login-action@v2
+      uses: pguyot/arm-runner-action@v2
       if: ${{ steps.read.outputs.tag }} != 'main'
       with:
         username: ${{ secrets.DOCKERHUB_LOGIN }}
         password: ${{ secrets.DOCKERHUB_PASS }}
     - name: Build and push
       uses: docker/build-push-action@v3
+      uses: pguyot/arm-runner-action@v2
       if: ${{ steps.read.outputs.tag }} != 'main'
       with:
         push: true
