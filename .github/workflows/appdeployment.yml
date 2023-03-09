@@ -24,10 +24,10 @@ jobs:
       run: |
         echo tag: ${{ steps.read.outputs.tag }}
     - name: Set up Docker Buildx      
-      uses: crazy-max/ghaction-docker-buildx@v1      
+      uses: crazy-max/ghaction-docker-buildx@v1
       with:        
         version: latest        
-        - name: Prepare      
+    - name: Prepare      
       if: success()      
       id: prepare      
       run: |        
