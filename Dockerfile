@@ -4,6 +4,6 @@ RUN apk add --no-cache \
     mariadb-connector-c \
     bash \
     curl \
-    bind-utils \
+    bind-tools \
     busybox-extras
 CMD exec /bin/bash -c "trap : TERM INT; sleep infinity & wait"
