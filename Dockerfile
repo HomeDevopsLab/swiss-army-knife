@@ -5,5 +5,6 @@ RUN apk add --no-cache \
     bash \
     curl \
     bind-tools \
-    busybox-extras
+    busybox-extras \
+    rsync
 CMD exec /bin/bash -c "trap : TERM INT; sleep infinity & wait"
