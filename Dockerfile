@@ -6,5 +6,6 @@ RUN apk add --no-cache \
     curl \
     bind-tools \
     busybox-extras \
-    rsync
+    rsync \
+    postgresql-client
 CMD exec /bin/bash -c "trap : TERM INT; sleep infinity & wait"

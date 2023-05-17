@@ -4,3 +4,5 @@
 * host command (bind-utils)
 * curl
 * telnet (busybox-extras)
+* rsync
+* postgresql-client
